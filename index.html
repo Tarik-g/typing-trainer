@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="de" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f7f7f5" />
+    <meta
+      name="description"
+      content="Ein fokussierter Python-Tipptrainer mit QWERTZ-Fingerhilfe, Schwachstellenanalyse und lokalem Fortschritt."
+    />
+    <title>KeyFlow – Python schneller tippen</title>
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="icon" href="./assets/icon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="./styles.css" />
+    <script src="./app.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Zum Inhalt springen</a>
+
+    <div class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="#practice" aria-label="KeyFlow Startseite">
+          <span class="brand-mark" aria-hidden="true">&gt;_</span>
+          <span>KeyFlow</span>
+        </a>
+
+        <nav class="main-nav" aria-label="Hauptnavigation">
+          <button class="nav-button is-active" type="button" data-view="practice" aria-current="page">
+            Üben
+          </button>
+          <button class="nav-button" type="button" data-view="analysis">Analyse</button>
+          <button class="nav-button" type="button" data-view="progress">Fortschritt</button>
+        </nav>
+
+        <div class="topbar-actions">
+          <span class="storage-badge" id="storage-badge">Demo-Modus</span>
+          <button class="icon-button" id="install-button" type="button" hidden>
+            <span aria-hidden="true">↓</span>
+            <span class="button-label">Installieren</span>
+          </button>
+          <button class="icon-button" id="theme-toggle" type="button" aria-label="Dunkles Design aktivieren">
+            <span id="theme-icon" aria-hidden="true">◐</span>
+          </button>
+        </div>
+      </header>
+
+      <div class="mode-notice" id="mode-notice" role="status">
+        <strong>Demo:</strong> Dein Fortschritt bleibt nur in diesem Tab. Nach dem Schließen startest du frisch.
+      </div>
+
+      <main id="main-content">
+        <section class="view is-active" id="practice-view" data-view-panel="practice">
+          <div class="page-heading practice-heading">
+            <div>
+              <p class="eyebrow" id="exercise-mode">PYTHON · STANDARD</p>
+              <h1 id="exercise-title">Python-Grundlagen</h1>
+              <p id="exercise-description">Tippe den Code möglichst sauber. Geschwindigkeit kommt danach.</p>
+            </div>
+            <div class="heading-actions">
+              <button class="button button-ghost" id="custom-text-button" type="button">Eigener Text</button>
+              <button class="button" id="new-exercise-button" type="button">Neue Übung</button>
+            </div>
+          </div>
+
+          <div class="live-metrics" aria-label="Aktuelle Tippwerte">
+            <div class="metric">
+              <span class="metric-value" id="wpm-value">0</span>
+              <span class="metric-label">WPM</span>
+            </div>
+            <div class="metric">
+              <span class="metric-value" id="accuracy-value">100%</span>
+              <span class="metric-label">Genauigkeit</span>
+            </div>
+            <div class="metric">
+              <span class="metric-value" id="time-value">00:00</span>
+              <span class="metric-label">Zeit</span>
+            </div>
+            <div class="metric">
+              <span class="metric-value" id="progress-value">0%</span>
+              <span class="metric-label">Fortschritt</span>
+            </div>
+          </div>
+
+          <div class="typing-card" id="typing-card">
+            <div
+              class="progress-track"
+              role="progressbar"
+              aria-label="Übungsfortschritt"
+              aria-valuemin="0"
+              aria-valuemax="100"
+              aria-valuenow="0"
+              id="typing-progress"
+            >
+              <span id="typing-progress-bar"></span>
+            </div>
+
+            <button class="typing-surface" id="typing-surface" type="button" aria-label="Tippübung fokussieren">
+              <pre id="code-display" aria-hidden="true"></pre>
+              <span class="typing-hint" id="typing-hint">Klicken und lostippen</span>
+            </button>
+
+            <textarea
+              class="typing-capture"
+              id="typing-input"
+              aria-label="Code hier tippen"
+              autocomplete="off"
+              autocapitalize="off"
+              autocorrect="off"
+              spellcheck="false"
+            ></textarea>
+
+            <div class="finger-guide" aria-live="polite">
+              <div class="next-key-copy">
+                <span class="guide-label">Nächste Taste</span>
+                <strong id="next-key">D</strong>
+                <span id="next-finger">linker Mittelfinger</span>
+              </div>
+              <div class="guide-tip">Tab fügt vier Leerzeichen ein · Esc löst den Fokus</div>
+            </div>
+          </div>
+
+          <section class="keyboard-section" aria-labelledby="keyboard-title">
+            <div class="section-heading compact-heading">
+              <div>
+                <p class="eyebrow">QWERTZ</p>
+                <h2 id="keyboard-title">Fingerführung</h2>
+              </div>
+              <span class="keyboard-hand" id="keyboard-hand">Linke Hand</span>
+            </div>
+            <div class="keyboard" id="keyboard" aria-label="Deutsche QWERTZ-Bildschirmtastatur"></div>
+          </section>
+
+          <section class="completion-card" id="completion-card" hidden aria-live="polite">
+            <div>
+              <p class="eyebrow">ÜBUNG GESCHAFFT</p>
+              <h2>Sauber getippt.</h2>
+              <p id="completion-summary">Deine Werte wurden gespeichert.</p>
+            </div>
+            <div class="completion-actions">
+              <button class="button button-ghost" id="review-analysis-button" type="button">Analyse ansehen</button>
+              <button class="button" id="continue-button" type="button">Weiterüben</button>
+            </div>
+          </section>
+        </section>
+
+        <section class="view" id="analysis-view" data-view-panel="analysis" hidden>
+          <div class="page-heading">
+            <div>
+              <p class="eyebrow">DEINE MUSTER</p>
+              <h1>Schwachstellen erkennen</h1>
+              <p>KeyFlow betrachtet Fehler und Reaktionszeit – ohne dir Daten schönzurechnen.</p>
+            </div>
+            <button class="button" id="personalized-button" type="button">Schwachstellen üben</button>
+          </div>
+
+          <div class="empty-state" id="analysis-empty">
+            <span class="empty-icon" aria-hidden="true">⌨</span>
+            <h2>Noch nicht genug Daten</h2>
+            <p>Schließe eine Übung ab. Danach siehst du schwierige Zeichen, Tastenkombinationen und Finger.</p>
+            <button class="button" type="button" data-go-practice>Erste Übung starten</button>
+          </div>
+
+          <div class="analysis-grid" id="analysis-content" hidden>
+            <section class="panel analysis-panel">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">ZEICHEN</p>
+                  <h2>Schwächste Tasten</h2>
+                </div>
+                <span>Tippen zum Üben</span>
+              </div>
+              <div class="rank-list" id="character-stats"></div>
+            </section>
+
+            <section class="panel analysis-panel">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">BIGRAMME</p>
+                  <h2>Schwierige Übergänge</h2>
+                </div>
+                <span>Zwei Tasten</span>
+              </div>
+              <div class="rank-list" id="bigram-stats"></div>
+            </section>
+
+            <section class="panel analysis-panel hand-panel">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">HÄNDE &amp; FINGER</p>
+                  <h2>Trefferquote</h2>
+                </div>
+                <span id="hand-balance-label">Ausgeglichen</span>
+              </div>
+              <div class="hand-summary" id="hand-summary"></div>
+              <div class="finger-bars" id="finger-stats"></div>
+            </section>
+          </div>
+        </section>
+
+        <section class="view" id="progress-view" data-view-panel="progress" hidden>
+          <div class="page-heading">
+            <div>
+              <p class="eyebrow">DEIN VERLAUF</p>
+              <h1>Fortschritt</h1>
+              <p>Wenige Kennzahlen, die dir wirklich zeigen, ob du besser wirst.</p>
+            </div>
+          </div>
+
+          <div class="summary-grid">
+            <div class="summary-card">
+              <span>Bestleistung</span>
+              <strong id="best-wpm">0 WPM</strong>
+            </div>
+            <div class="summary-card">
+              <span>Serie</span>
+              <strong id="streak-value">0 Tage</strong>
+            </div>
+            <div class="summary-card">
+              <span>Übungszeit</span>
+              <strong id="total-time">0 Min.</strong>
+            </div>
+          </div>
+
+          <div class="progress-layout">
+            <section class="panel chart-panel">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">LETZTE SESSIONS</p>
+                  <h2>WPM-Verlauf</h2>
+                </div>
+                <span id="chart-caption">Noch keine Daten</span>
+              </div>
+              <div class="chart-empty" id="chart-empty">Dein Diagramm erscheint nach der ersten fertigen Übung.</div>
+              <svg
+                class="progress-chart"
+                id="progress-chart"
+                viewBox="0 0 720 250"
+                role="img"
+                aria-label="Verlauf der Wörter pro Minute"
+                hidden
+              ></svg>
+            </section>
+
+            <section class="panel goal-panel">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">ZIEL</p>
+                  <h2>WPM-Ziel</h2>
+                </div>
+                <strong id="goal-output">60 WPM</strong>
+              </div>
+              <input id="goal-input" type="range" min="20" max="120" step="5" value="60" aria-label="WPM-Ziel" />
+              <div class="goal-progress" aria-hidden="true"><span id="goal-progress-bar"></span></div>
+              <p id="goal-copy">Starte mit einer Übung, um deinen Abstand zum Ziel zu sehen.</p>
+            </section>
+          </div>
+
+          <section class="panel history-panel">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">VERLAUF</p>
+                <h2>Letzte Übungen</h2>
+              </div>
+              <button class="text-button danger-text" id="reset-progress-button" type="button">Fortschritt löschen</button>
+            </div>
+            <div class="history-list" id="history-list">
+              <p class="history-empty">Noch keine abgeschlossenen Übungen.</p>
+            </div>
+          </section>
+        </section>
+      </main>
+
+      <footer>
+        <span>Privat by design: keine Anmeldung, kein Tracking, keine Cloud.</span>
+        <a href="https://github.com/Tarik-g/typing-trainer" rel="noreferrer">GitHub</a>
+      </footer>
+    </div>
+
+    <dialog class="modal" id="custom-text-dialog">
+      <form method="dialog" id="custom-text-form">
+        <div class="modal-heading">
+          <div>
+            <p class="eyebrow">TYPE ANYTHING</p>
+            <h2>Eigenen Code üben</h2>
+          </div>
+          <button class="icon-button" type="button" id="close-custom-dialog" aria-label="Dialog schließen">×</button>
+        </div>
+        <label for="custom-title">Titel</label>
+        <input id="custom-title" type="text" maxlength="50" placeholder="Meine Python-Übung" />
+        <label for="custom-text">Code oder Text</label>
+        <textarea
+          id="custom-text"
+          rows="10"
+          required
+          spellcheck="false"
+          placeholder="def hello(name):&#10;    return f\"Hallo, {name}!\""
+        ></textarea>
+        <p class="form-error" id="custom-error" role="alert" hidden>Bitte gib mindestens zehn Zeichen ein.</p>
+        <div class="modal-actions">
+          <button class="button button-ghost" type="button" id="cancel-custom-dialog">Abbrechen</button>
+          <button class="button" type="submit">Übung starten</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog class="modal confirm-modal" id="reset-dialog">
+      <form method="dialog">
+        <p class="eyebrow">FORTSCHRITT LÖSCHEN</p>
+        <h2>Wirklich neu anfangen?</h2>
+        <p>Alle lokal gespeicherten Sessions und Tippstatistiken werden entfernt. Das lässt sich nicht rückgängig machen.</p>
+        <div class="modal-actions">
+          <button class="button button-ghost" value="cancel">Abbrechen</button>
+          <button class="button button-danger" id="confirm-reset-button" value="confirm">Alles löschen</button>
+        </div>
+      </form>
+    </dialog>
+
+    <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+  </body>
+</html>

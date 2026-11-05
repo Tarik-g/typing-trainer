@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">KeyFlow</title>
+  <desc id="desc">Blaues App-Symbol mit einer Code-Eingabeaufforderung</desc>
+  <rect width="512" height="512" rx="112" fill="#3f78b5"/>
+  <path d="M128 172 216 256l-88 84" fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="42"/>
+  <path d="M250 340h134" fill="none" stroke="#fff" stroke-linecap="round" stroke-width="42"/>
+</svg>
