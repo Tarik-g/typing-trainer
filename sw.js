@@ -1,18 +1,21 @@
 "use strict";
 
-const CACHE_NAME = "keyflow-v2";
+const CACHE_NAME = "keyflow-v5";
 const APP_FILES = [
   "./",
   "./index.html",
-  "./styles.css?v=2",
-  "./app.js?v=2",
+  "./styles.css?v=4",
+  "./core.js?v=4",
+  "./app.js?v=4",
   "./manifest.webmanifest",
   "./assets/icon.svg",
+  "./assets/icon-192.png",
+  "./assets/icon-512.png",
+  "./assets/apple-touch-icon.png",
 ];
 
 self.addEventListener("install", (event) => {
-  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_FILES)));
-  self.skipWaiting();
+  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_FILES)).then(() => self.skipWaiting()));
 });
 
 self.addEventListener("activate", (event) => {
@@ -31,10 +34,10 @@ self.addEventListener("fetch", (event) => {
 
   event.respondWith(
     fetch(event.request)
-      .then((response) => {
+      .then(async (response) => {
         if (response.ok) {
-          const copy = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+          const cache = await caches.open(CACHE_NAME);
+          await cache.put(event.request, response.clone());
         }
         return response;
       })

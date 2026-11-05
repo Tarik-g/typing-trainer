@@ -99,6 +99,16 @@ textarea:focus-visible {
   display: none !important;
 }
 
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: pre-wrap !important;
+  clip-path: inset(50%) !important;
+}
+
 .skip-link {
   position: fixed;
   z-index: 100;
@@ -311,9 +321,25 @@ main {
 .completion-actions,
 .modal-actions {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 10px;
   flex-shrink: 0;
+}
+
+.exercise-picker select {
+  min-height: 40px;
+  max-width: 230px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text-strong);
+  padding: 8px 32px 8px 11px;
+  font-weight: 600;
+}
+
+.exercise-picker select:hover {
+  border-color: var(--text-muted);
 }
 
 .button {
@@ -813,6 +839,7 @@ main {
 
 .finger-stat-heading {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   gap: 8px;
   margin-bottom: 6px;
@@ -1038,6 +1065,7 @@ footer a {
   color: var(--text);
   box-shadow: var(--shadow);
   padding: 0;
+  overflow-y: auto;
 }
 
 .modal::backdrop {
@@ -1148,6 +1176,14 @@ footer a {
     padding-bottom: 105px;
   }
 
+  footer {
+    padding-bottom: 88px;
+  }
+
+  .toast {
+    bottom: 76px;
+  }
+
   .page-heading {
     align-items: flex-start;
     flex-direction: column;
@@ -1199,6 +1235,15 @@ footer a {
   .heading-actions .button,
   .completion-actions .button {
     flex: 1;
+  }
+
+  .exercise-picker {
+    flex: 1 0 100%;
+  }
+
+  .exercise-picker select {
+    width: 100%;
+    max-width: none;
   }
 
   .live-metrics {

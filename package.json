@@ -4,7 +4,7 @@
   "private": true,
   "description": "Ein schlanker Python-Tipptrainer für QWERTZ-Tastaturen.",
   "scripts": {
-    "test": "node --check app.js && node --check sw.js && node tests/smoke.mjs"
+    "test": "node --check core.js && node --check app.js && node --check sw.js && node --test tests/core.test.mjs && node tests/smoke.mjs"
   },
   "engines": {
     "node": ">=20"

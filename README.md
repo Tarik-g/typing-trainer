@@ -11,6 +11,7 @@ Ein bewusst schlanker Python-Tipptrainer für deutsche QWERTZ-Tastaturen.
 - QWERTZ-Bildschirmtastatur mit Finger- und Handführung
 - Analyse schwacher Zeichen, Bigramme, Hände und Finger
 - Personalisierte Übungen auf Basis der eigenen Schwachstellen
+- Vorbereitete Übungen für NumPy, pandas, PyTorch, scikit-learn, Matplotlib, Requests und FastAPI
 - Eigene Texte oder Codebeispiele einfügen
 - Bestleistung, Streak, WPM-Ziel und kompakter Fortschrittsverlauf
 - Helles TypeQuicker-inspiriertes Design und dunkles Tokyo-Night-Design

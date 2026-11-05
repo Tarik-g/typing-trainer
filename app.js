@@ -1,5 +1,7 @@
 "use strict";
 
+const { chooseStorageMode, isValidSession, calculateMetrics, calculateStreak } = globalThis.KeyFlowCore;
+
 const EXERCISES = [
   {
     id: "average",
@@ -118,6 +120,146 @@ const EXERCISES = [
       "print(group_by_length(words))",
     ].join("\n"),
   },
+  {
+    id: "numpy-array-analysis",
+    title: "NumPy · Arrays auswerten",
+    description: "Mittelwerte und das beste Ergebnis in einem Array finden.",
+    category: "Data & Machine Learning",
+    package: "NumPy",
+    code: [
+      "import numpy as np",
+      "",
+      "scores = np.array([",
+      "    [82, 91, 88],",
+      "    [75, 84, 90],",
+      "    [93, 89, 95],",
+      "])",
+      "subject_means = scores.mean(axis=0)",
+      "best_student = scores.mean(axis=1).argmax()",
+      "",
+      "print(subject_means)",
+      "print(f\"Best student index: {best_student}\")",
+    ].join("\n"),
+  },
+  {
+    id: "pandas-groupby",
+    title: "pandas · Umsätze gruppieren",
+    description: "Eine Tabelle erstellen und Werte nach Team zusammenfassen.",
+    category: "Data & Machine Learning",
+    package: "pandas",
+    code: [
+      "import pandas as pd",
+      "",
+      "sales = pd.DataFrame({",
+      "    \"team\": [\"North\", \"South\", \"North\", \"South\"],",
+      "    \"revenue\": [1200, 950, 1430, 1110],",
+      "})",
+      "average_revenue = sales.groupby(\"team\")[\"revenue\"].mean()",
+      "",
+      "print(average_revenue)",
+    ].join("\n"),
+  },
+  {
+    id: "pytorch-network",
+    title: "PyTorch · Kleines Netz",
+    description: "Ein kompaktes neuronales Netz definieren und ausführen.",
+    category: "Data & Machine Learning",
+    package: "PyTorch",
+    code: [
+      "import torch",
+      "from torch import nn",
+      "",
+      "model = nn.Sequential(",
+      "    nn.Linear(4, 8),",
+      "    nn.ReLU(),",
+      "    nn.Linear(8, 2),",
+      ")",
+      "inputs = torch.randn(3, 4)",
+      "logits = model(inputs)",
+      "",
+      "print(logits.shape)",
+    ].join("\n"),
+  },
+  {
+    id: "sklearn-pipeline",
+    title: "scikit-learn · Pipeline",
+    description: "Daten skalieren und eine kleine Klassifikation trainieren.",
+    category: "Data & Machine Learning",
+    package: "scikit-learn",
+    code: [
+      "from sklearn.linear_model import LogisticRegression",
+      "from sklearn.pipeline import make_pipeline",
+      "from sklearn.preprocessing import StandardScaler",
+      "",
+      "features = [[0.2, 1.1], [0.5, 1.4], [1.3, 0.4], [1.6, 0.2]]",
+      "labels = [0, 0, 1, 1]",
+      "model = make_pipeline(StandardScaler(), LogisticRegression())",
+      "model.fit(features, labels)",
+      "prediction = model.predict([[1.1, 0.5]])",
+      "",
+      "print(prediction)",
+    ].join("\n"),
+  },
+  {
+    id: "matplotlib-line-chart",
+    title: "Matplotlib · Liniendiagramm",
+    description: "Übungszeiten als beschriftetes Diagramm darstellen.",
+    category: "Web & Visualisierung",
+    package: "Matplotlib",
+    code: [
+      "import matplotlib.pyplot as plt",
+      "",
+      "days = [\"Mo\", \"Di\", \"Mi\", \"Do\", \"Fr\"]",
+      "minutes = [12, 18, 10, 24, 20]",
+      "fig, ax = plt.subplots()",
+      "ax.plot(days, minutes, marker=\"o\")",
+      "ax.set_title(\"Übungszeit\")",
+      "ax.set_ylabel(\"Minuten\")",
+      "ax.grid(True)",
+      "",
+      "plt.show()",
+    ].join("\n"),
+  },
+  {
+    id: "requests-get-json",
+    title: "Requests · JSON abrufen",
+    description: "Eine GET-Anfrage senden und die JSON-Antwort lesen.",
+    category: "Web & Visualisierung",
+    package: "Requests",
+    code: [
+      "import requests",
+      "",
+      "params = {\"language\": \"python\", \"limit\": 3}",
+      "response = requests.get(",
+      "    \"https://httpbin.org/get\",",
+      "    params=params,",
+      "    timeout=10,",
+      ")",
+      "response.raise_for_status()",
+      "data = response.json()",
+      "",
+      "print(data[\"args\"])",
+    ].join("\n"),
+  },
+  {
+    id: "fastapi-query-route",
+    title: "FastAPI · Query-Route",
+    description: "Eine API-Route mit Pfad- und Query-Parameter definieren.",
+    category: "Web & Visualisierung",
+    package: "FastAPI",
+    code: [
+      "from fastapi import FastAPI",
+      "",
+      "app = FastAPI()",
+      "",
+      "@app.get(\"/items/{item_id}\")",
+      "async def read_item(item_id: str, q: str | None = None):",
+      "    if q:",
+      "        return {\"item_id\": item_id, \"q\": q}",
+      "",
+      "    return {\"item_id\": item_id}",
+    ].join("\n"),
+  },
 ];
 
 const KEYBOARD_ROWS = [
@@ -183,10 +325,14 @@ const SHIFTED_KEY_MAP = {
 };
 
 const STORAGE_KEY = "keyflow-data-v1";
-const isStandalone =
-  window.matchMedia("(display-mode: standalone)").matches ||
-  window.navigator.standalone === true ||
-  window.location.protocol === "file:";
+const storageMode = chooseStorageMode({
+  displayStandalone: window.matchMedia("(display-mode: standalone)").matches,
+  displayWindowControlsOverlay: window.matchMedia("(display-mode: window-controls-overlay)").matches,
+  navigatorStandalone: window.navigator.standalone === true,
+  windowControlsOverlayVisible: Boolean(window.navigator.windowControlsOverlay?.visible),
+  protocol: window.location.protocol,
+});
+const isStandalone = storageMode === "local";
 const appStorage = isStandalone ? window.localStorage : window.sessionStorage;
 
 const $ = (selector, root = document) => root.querySelector(selector);
@@ -203,11 +349,13 @@ const elements = {
   exerciseMode: $("#exercise-mode"),
   exerciseTitle: $("#exercise-title"),
   exerciseDescription: $("#exercise-description"),
+  exerciseSelect: $("#exercise-select"),
   codeDisplay: $("#code-display"),
   typingCard: $("#typing-card"),
   typingSurface: $("#typing-surface"),
   typingInput: $("#typing-input"),
   typingHint: $("#typing-hint"),
+  targetCodeAccessible: $("#target-code-accessible"),
   progress: $("#typing-progress"),
   progressBar: $("#typing-progress-bar"),
   wpm: $("#wpm-value"),
@@ -312,16 +460,6 @@ function sanitizeStats(value) {
   return clean;
 }
 
-function isValidSession(session) {
-  return (
-    session &&
-    typeof session === "object" &&
-    typeof session.date === "string" &&
-    Number.isFinite(Number(session.wpm)) &&
-    Number.isFinite(Number(session.accuracy))
-  );
-}
-
 function saveData() {
   try {
     appStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
@@ -336,6 +474,7 @@ function clamp(value, min, max) {
 
 function init() {
   renderKeyboard();
+  renderExerciseLibrary();
   bindEvents();
   applyTheme(appData.theme, false);
   updateStorageMode();
@@ -367,6 +506,12 @@ function bindEvents() {
   elements.typingInput.addEventListener("focus", () => elements.typingHint.classList.add("is-hidden"));
 
   $("#new-exercise-button").addEventListener("click", startNextExercise);
+  elements.exerciseSelect.addEventListener("change", () => {
+    const selectedIndex = EXERCISES.findIndex((exercise) => exercise.id === elements.exerciseSelect.value);
+    if (selectedIndex < 0) return;
+    exerciseIndex = selectedIndex;
+    loadExercise(EXERCISES[selectedIndex]);
+  });
   $("#continue-button").addEventListener("click", startNextExercise);
   $("#review-analysis-button").addEventListener("click", () => switchView("analysis"));
   $("#personalized-button").addEventListener("click", startPersonalizedExercise);
@@ -451,6 +596,8 @@ function loadExercise(exercise, { focus = true, modeLabel } = {}) {
   elements.exerciseTitle.textContent = exercise.title;
   elements.exerciseDescription.textContent = exercise.description;
   elements.exerciseMode.textContent = modeLabel || getModeLabel(exercise);
+  elements.targetCodeAccessible.textContent = targetText;
+  elements.exerciseSelect.value = EXERCISES.some((item) => item.id === exercise.id) ? exercise.id : "";
   elements.completionCard.hidden = true;
   elements.typingHint.classList.remove("is-hidden");
   renderTypingState();
@@ -464,7 +611,38 @@ function loadExercise(exercise, { focus = true, modeLabel } = {}) {
 function getModeLabel(exercise) {
   if (exercise.mode === "custom") return "EIGENER TEXT";
   if (exercise.mode === "personalized") return "PYTHON · PERSONALISIERT";
+  if (exercise.package) return `PYTHON · ${exercise.package.toUpperCase()}`;
   return "PYTHON · STANDARD";
+}
+
+function renderExerciseLibrary() {
+  const groups = new Map();
+  const placeholder = document.createElement("option");
+  placeholder.value = "";
+  placeholder.textContent = "Übung auswählen";
+  placeholder.disabled = true;
+  const fragment = document.createDocumentFragment();
+  fragment.append(placeholder);
+
+  EXERCISES.forEach((exercise) => {
+    const category = exercise.category || "Python Basics";
+    if (!groups.has(category)) groups.set(category, []);
+    groups.get(category).push(exercise);
+  });
+
+  groups.forEach((exercises, category) => {
+    const group = document.createElement("optgroup");
+    group.label = category;
+    exercises.forEach((exercise) => {
+      const option = document.createElement("option");
+      option.value = exercise.id;
+      option.textContent = exercise.title;
+      group.append(option);
+    });
+    fragment.append(group);
+  });
+
+  elements.exerciseSelect.replaceChildren(fragment);
 }
 
 function startNextExercise() {
@@ -503,7 +681,27 @@ function findBestExercise(targets) {
     return { exercise, score };
   }).sort((a, b) => b.score - a.score);
 
-  return scored[0].score > 0 ? scored[0].exercise : EXERCISES[(exerciseIndex + 1) % EXERCISES.length];
+  return scored[0].score > 0 ? scored[0].exercise : createTargetExercise(targets[0]);
+}
+
+function createTargetExercise(token) {
+  const safeToken = token || "_";
+  const repeated = Array(8).fill(safeToken).join(" ");
+  return {
+    id: `target-${Date.now()}`,
+    title: `Fokus: ${prettyToken(safeToken)}`,
+    description: "Kurze Zielübung für eine persönliche Schwachstelle.",
+    code: [
+      `# Fokus: ${safeToken}`,
+      "def repeat_pattern():",
+      `    # ${repeated}`,
+      `    pattern = ${JSON.stringify(repeated)}`,
+      "    return pattern",
+      "",
+      "print(repeat_pattern())",
+    ].join("\n"),
+    mode: "personalized",
+  };
 }
 
 function countOccurrences(text, token) {
@@ -588,7 +786,9 @@ function handleTypingInput() {
 
   const now = performance.now();
   const commonLength = commonPrefixLength(typedText, nextValue);
-  const additions = nextValue.length > commonLength ? nextValue.slice(commonLength) : "";
+  const commonSuffix = commonSuffixLength(typedText, nextValue, commonLength);
+  const changedEnd = nextValue.length - commonSuffix;
+  const additions = changedEnd > commonLength ? nextValue.slice(commonLength, changedEnd) : "";
 
   if (additions.length > 0) {
     if (startedAt === null) {
@@ -618,6 +818,17 @@ function commonPrefixLength(left, right) {
   let index = 0;
   while (index < limit && left[index] === right[index]) index += 1;
   return index;
+}
+
+function commonSuffixLength(left, right, prefixLength) {
+  const available = Math.min(left.length, right.length) - prefixLength;
+  let count = 0;
+
+  while (count < available && left[left.length - 1 - count] === right[right.length - 1 - count]) {
+    count += 1;
+  }
+
+  return count;
 }
 
 function recordAttempt(index, actualCharacter, delayMs) {
@@ -679,18 +890,14 @@ function renderTypingState() {
 
 function getLiveMetrics() {
   const elapsedSeconds = startedAt === null ? 0 : Math.max(0, (performance.now() - startedAt) / 1000);
-  let correctCharacters = 0;
-
-  for (let index = 0; index < typedText.length; index += 1) {
-    if (typedText[index] === targetText[index]) correctCharacters += 1;
-  }
-
-  const minutes = Math.max(elapsedSeconds / 60, 1 / 60);
-  const wpm = startedAt === null ? 0 : Math.max(0, Math.round(correctCharacters / 5 / minutes));
-  const accuracy = totalKeystrokes === 0 ? 100 : Math.round(((totalKeystrokes - incorrectKeystrokes) / totalKeystrokes) * 100);
-  const progress = targetText.length === 0 ? 0 : Math.round((typedText.length / targetText.length) * 100);
-
-  return { elapsedSeconds, correctCharacters, wpm, accuracy: clamp(accuracy, 0, 100), progress: clamp(progress, 0, 100) };
+  return calculateMetrics({
+    targetText,
+    typedText,
+    totalKeystrokes,
+    incorrectKeystrokes,
+    elapsedSeconds,
+    started: startedAt !== null,
+  });
 }
 
 function renderLiveMetrics() {
@@ -871,7 +1078,8 @@ function renderRankList(container, items, kind) {
     const track = document.createElement("span");
     track.className = "micro-track";
     const fill = document.createElement("span");
-    fill.style.width = `${Math.max(4, 100 - item.accuracy)}%`;
+    const errorRate = 100 - item.accuracy;
+    fill.style.width = `${errorRate > 0 ? Math.max(4, errorRate) : 0}%`;
     track.append(fill);
     details.append(caption, track);
 
@@ -889,13 +1097,15 @@ function renderHandStats() {
   const fingerStats = {};
 
   for (const fingerId of Object.keys(FINGERS)) {
-    fingerStats[fingerId] = { attempts: 0, errors: 0 };
+    fingerStats[fingerId] = { attempts: 0, errors: 0, totalMs: 0, timedAttempts: 0 };
   }
 
   for (const [character, stat] of Object.entries(appData.keyStats)) {
     const fingerId = getFingerId(getBaseKey(character));
     fingerStats[fingerId].attempts += stat.attempts;
     fingerStats[fingerId].errors += stat.errors;
+    fingerStats[fingerId].totalMs += stat.totalMs;
+    fingerStats[fingerId].timedAttempts += stat.timedAttempts;
   }
 
   const left = aggregateFingerSide(fingerStats, "l-");
@@ -903,11 +1113,18 @@ function renderHandStats() {
   const leftAccuracy = accuracyFromStat(left);
   const rightAccuracy = accuracyFromStat(right);
   const difference = Math.abs(leftAccuracy - rightAccuracy);
-  elements.handBalanceLabel.textContent = difference <= 4 ? "Ausgeglichen" : leftAccuracy < rightAccuracy ? "Links braucht Fokus" : "Rechts braucht Fokus";
+  elements.handBalanceLabel.textContent =
+    left.attempts === 0 || right.attempts === 0
+      ? "Mehr Daten nötig"
+      : difference <= 4
+        ? "Ausgeglichen"
+        : leftAccuracy < rightAccuracy
+          ? "Links braucht Fokus"
+          : "Rechts braucht Fokus";
 
   elements.handSummary.replaceChildren(
-    createHandCard("Linke Hand", leftAccuracy, left.attempts),
-    createHandCard("Rechte Hand", rightAccuracy, right.attempts),
+    createHandCard("Linke Hand", leftAccuracy, left),
+    createHandCard("Rechte Hand", rightAccuracy, right),
   );
 
   const fragment = document.createDocumentFragment();
@@ -923,7 +1140,8 @@ function renderHandStats() {
       const label = document.createElement("span");
       label.textContent = FINGERS[fingerId].short;
       const value = document.createElement("strong");
-      value.textContent = stat.attempts > 0 ? `${accuracy}%` : "–";
+      const averageMs = averageMsFromStat(stat);
+      value.textContent = stat.attempts > 0 ? `${accuracy}%${averageMs > 0 ? ` · ${averageMs} ms` : ""}` : "–";
       heading.append(label, value);
 
       const track = document.createElement("div");
@@ -942,8 +1160,13 @@ function aggregateFingerSide(stats, prefix) {
   return Object.entries(stats)
     .filter(([fingerId]) => fingerId.startsWith(prefix))
     .reduce(
-      (result, [, stat]) => ({ attempts: result.attempts + stat.attempts, errors: result.errors + stat.errors }),
-      { attempts: 0, errors: 0 },
+      (result, [, stat]) => ({
+        attempts: result.attempts + stat.attempts,
+        errors: result.errors + stat.errors,
+        totalMs: result.totalMs + stat.totalMs,
+        timedAttempts: result.timedAttempts + stat.timedAttempts,
+      }),
+      { attempts: 0, errors: 0, totalMs: 0, timedAttempts: 0 },
     );
 }
 
@@ -951,17 +1174,22 @@ function accuracyFromStat(stat) {
   return stat.attempts > 0 ? clamp(Math.round(((stat.attempts - stat.errors) / stat.attempts) * 100), 0, 100) : 0;
 }
 
-function createHandCard(label, accuracy, attempts) {
+function averageMsFromStat(stat) {
+  return stat.timedAttempts > 0 ? Math.round(stat.totalMs / stat.timedAttempts) : 0;
+}
+
+function createHandCard(label, accuracy, stat) {
   const card = document.createElement("div");
   card.className = "hand-card";
   const copy = document.createElement("div");
   const title = document.createElement("strong");
   title.textContent = label;
   const detail = document.createElement("span");
-  detail.textContent = `${attempts} Anschläge`;
+  const averageMs = averageMsFromStat(stat);
+  detail.textContent = `${stat.attempts} Anschläge${averageMs > 0 ? ` · Ø ${averageMs} ms` : ""}`;
   copy.append(title, detail);
   const value = document.createElement("strong");
-  value.textContent = attempts > 0 ? `${accuracy}%` : "–";
+  value.textContent = stat.attempts > 0 ? `${accuracy}%` : "–";
   card.append(copy, value);
   return card;
 }
@@ -1115,44 +1343,6 @@ function createHistoryStat(value, label) {
   caption.textContent = label;
   stat.append(strong, caption);
   return stat;
-}
-
-function calculateStreak(sessions) {
-  if (sessions.length === 0) return 0;
-  const uniqueDays = [...new Set(sessions.map((session) => localDateKey(new Date(session.date))))].sort().reverse();
-  const today = startOfLocalDay(new Date());
-  const latest = parseLocalDateKey(uniqueDays[0]);
-  const differenceFromToday = Math.round((today - latest) / 86400000);
-  if (differenceFromToday > 1) return 0;
-
-  let streak = 1;
-  let previous = latest;
-
-  for (let index = 1; index < uniqueDays.length; index += 1) {
-    const current = parseLocalDateKey(uniqueDays[index]);
-    const difference = Math.round((previous - current) / 86400000);
-    if (difference !== 1) break;
-    streak += 1;
-    previous = current;
-  }
-
-  return streak;
-}
-
-function startOfLocalDay(date) {
-  return new Date(date.getFullYear(), date.getMonth(), date.getDate(), 12);
-}
-
-function localDateKey(date) {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-}
-
-function parseLocalDateKey(key) {
-  const [year, month, day] = key.split("-").map(Number);
-  return new Date(year, month - 1, day, 12);
 }
 
 function resetProgress() {

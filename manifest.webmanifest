@@ -7,11 +7,22 @@
   "start_url": "./#practice",
   "scope": "./",
   "display": "standalone",
-  "display_override": ["window-controls-overlay", "standalone"],
-  "background_color": "#1a1b26",
+  "background_color": "#ffffff",
   "theme_color": "#3f78b5",
   "orientation": "any",
   "icons": [
+    {
+      "src": "./assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
     {
       "src": "./assets/icon.svg",
       "sizes": "any",

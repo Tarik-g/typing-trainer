@@ -11,8 +11,10 @@
     <title>KeyFlow – Python schneller tippen</title>
     <link rel="manifest" href="./manifest.webmanifest" />
     <link rel="icon" href="./assets/icon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="./styles.css?v=2" />
-    <script src="./app.js?v=2" defer></script>
+    <link rel="apple-touch-icon" href="./assets/apple-touch-icon.png" />
+    <link rel="stylesheet" href="./styles.css?v=4" />
+    <script src="./core.js?v=4" defer></script>
+    <script src="./app.js?v=4" defer></script>
   </head>
   <body>
     <a class="skip-link" href="#main-content">Zum Inhalt springen</a>
@@ -34,7 +36,7 @@
 
         <div class="topbar-actions">
           <span class="storage-badge" id="storage-badge">Demo-Modus</span>
-          <button class="icon-button" id="install-button" type="button" hidden>
+          <button class="icon-button" id="install-button" type="button" aria-label="KeyFlow installieren" hidden>
             <span aria-hidden="true">↓</span>
             <span class="button-label">Installieren</span>
           </button>
@@ -57,6 +59,10 @@
               <p id="exercise-description">Tippe den Code möglichst sauber. Geschwindigkeit kommt danach.</p>
             </div>
             <div class="heading-actions">
+              <label class="exercise-picker" for="exercise-select">
+                <span class="sr-only">Vorbereitete Übung auswählen</span>
+                <select id="exercise-select" aria-label="Vorbereitete Übung auswählen"></select>
+              </label>
               <button class="button button-ghost" id="custom-text-button" type="button">Eigener Text</button>
               <button class="button" id="new-exercise-button" type="button">Neue Übung</button>
             </div>
@@ -99,17 +105,23 @@
               <span class="typing-hint" id="typing-hint">Klicken und lostippen</span>
             </button>
 
+            <p class="sr-only" id="typing-instructions">
+              Tippe den folgenden Zieltext vollständig. Fehler bleiben in der Genauigkeit erhalten, auch wenn du sie korrigierst.
+            </p>
+            <pre class="sr-only" id="target-code-accessible"></pre>
+
             <textarea
               class="typing-capture"
               id="typing-input"
               aria-label="Code hier tippen"
+              aria-describedby="typing-instructions target-code-accessible"
               autocomplete="off"
               autocapitalize="off"
               autocorrect="off"
               spellcheck="false"
             ></textarea>
 
-            <div class="finger-guide" aria-live="polite">
+            <div class="finger-guide">
               <div class="next-key-copy">
                 <span class="guide-label">Nächste Taste</span>
                 <strong id="next-key">D</strong>
@@ -276,12 +288,12 @@
       </footer>
     </div>
 
-    <dialog class="modal" id="custom-text-dialog">
+    <dialog class="modal" id="custom-text-dialog" aria-labelledby="custom-dialog-title">
       <form method="dialog" id="custom-text-form">
         <div class="modal-heading">
           <div>
             <p class="eyebrow">TYPE ANYTHING</p>
-            <h2>Eigenen Code üben</h2>
+            <h2 id="custom-dialog-title">Eigenen Code üben</h2>
           </div>
           <button class="icon-button" type="button" id="close-custom-dialog" aria-label="Dialog schließen">×</button>
         </div>
@@ -303,10 +315,10 @@
       </form>
     </dialog>
 
-    <dialog class="modal confirm-modal" id="reset-dialog">
+    <dialog class="modal confirm-modal" id="reset-dialog" aria-labelledby="reset-dialog-title">
       <form method="dialog">
         <p class="eyebrow">FORTSCHRITT LÖSCHEN</p>
-        <h2>Wirklich neu anfangen?</h2>
+        <h2 id="reset-dialog-title">Wirklich neu anfangen?</h2>
         <p>Alle lokal gespeicherten Sessions und Tippstatistiken werden entfernt. Das lässt sich nicht rückgängig machen.</p>
         <div class="modal-actions">
           <button class="button button-ghost" value="cancel">Abbrechen</button>
