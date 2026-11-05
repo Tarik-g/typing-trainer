@@ -1002,7 +1002,7 @@ function renderGoal(bestWpmOverride) {
 function renderChart(sessions) {
   const points = sessions.slice(-10);
   const hasPoints = points.length > 0;
-  elements.chart.hidden = !hasPoints;
+  elements.chart.toggleAttribute("hidden", !hasPoints);
   elements.chartEmpty.hidden = hasPoints;
 
   if (!hasPoints) {

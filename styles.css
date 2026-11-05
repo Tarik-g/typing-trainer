@@ -1122,6 +1122,8 @@ footer a {
 @media (max-width: 820px) {
   .topbar {
     grid-template-columns: 1fr auto;
+    background: var(--surface);
+    backdrop-filter: none;
   }
 
   .main-nav {
@@ -1238,18 +1240,22 @@ footer a {
   }
 
   .keyboard-row {
+    width: 100%;
     gap: 3px;
   }
 
   .key {
-    width: clamp(21px, 6.8vw, 38px);
+    width: auto;
+    min-width: 0;
+    flex: 1 1 0;
     height: 34px;
     border-radius: 5px;
     font-size: 9px;
   }
 
   .key.key-wide {
-    width: 46vw;
+    width: auto;
+    flex: 0 0 46%;
   }
 
   .completion-card,

@@ -19,7 +19,7 @@ const manifest = JSON.parse(contents["manifest.webmanifest"]);
 assert.equal(manifest.start_url, "./#practice", "PWA start URL must stay relative for GitHub Pages");
 assert.equal(manifest.scope, "./", "PWA scope must stay relative for GitHub Pages");
 assert.match(contents["index.html"], /href="\.\/manifest\.webmanifest"/u);
-assert.match(contents["index.html"], /src="\.\/app\.js"/u);
+assert.match(contents["index.html"], /src="\.\/app\.js\?v=\d+"/u);
 assert.match(contents["app.js"], /isStandalone \? window\.localStorage : window\.sessionStorage/u);
 assert.match(contents["index.html"], /QWERTZ/u);
 assert.match(contents["styles.css"], /#1a1b26/u, "Tokyo Night background token is missing");

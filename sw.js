@@ -1,11 +1,11 @@
 "use strict";
 
-const CACHE_NAME = "keyflow-v1";
+const CACHE_NAME = "keyflow-v2";
 const APP_FILES = [
   "./",
   "./index.html",
-  "./styles.css",
-  "./app.js",
+  "./styles.css?v=2",
+  "./app.js?v=2",
   "./manifest.webmanifest",
   "./assets/icon.svg",
 ];
@@ -29,26 +29,20 @@ self.addEventListener("fetch", (event) => {
   const requestUrl = new URL(event.request.url);
   if (requestUrl.origin !== self.location.origin) return;
 
-  if (event.request.mode === "navigate") {
-    event.respondWith(
-      fetch(event.request).catch(() => caches.match(new URL("./index.html", self.registration.scope))),
-    );
-    return;
-  }
-
   event.respondWith(
-    caches.match(event.request).then((cached) => {
-      const network = fetch(event.request)
-        .then((response) => {
-          if (response.ok) {
-            const copy = response.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
-          }
-          return response;
-        })
-        .catch(() => cached);
-
-      return cached || network;
-    }),
+    fetch(event.request)
+      .then((response) => {
+        if (response.ok) {
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+        }
+        return response;
+      })
+      .catch(() => {
+        if (event.request.mode === "navigate") {
+          return caches.match(new URL("./index.html", self.registration.scope));
+        }
+        return caches.match(event.request);
+      }),
   );
 });
